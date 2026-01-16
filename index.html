@@ -16,10 +16,29 @@ body{
 
 h1{margin-bottom:10px;}
 
+#wheel-container{
+  position: relative;
+  width:400px;
+  height:400px;
+}
+
 canvas{
-  background:white;
   border-radius:50%;
   box-shadow:0 0 15px rgba(0,0,0,0.2);
+}
+
+/* Pointer outside the wheel, pointing inwards */
+.pointer{
+  position:absolute;
+  top:-20px;       /* above the wheel */
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:15px solid transparent;
+  border-right:15px solid transparent;
+  border-bottom:30px solid red; /* arrow pointing down toward wheel */
+  z-index:10;
 }
 
 button{
@@ -39,14 +58,18 @@ button:hover{opacity:0.9;}
   margin-top:20px;
   font-size:20px;
   font-weight:bold;
+  text-align:center;
 }
 </style>
 </head>
 <body>
 
-<h1>初三4 班级转盘</h1>
+<h1>初三4 抽签转盘</h1>
 
-<canvas id="wheel" width="400" height="400"></canvas>
+<div id="wheel-container">
+  <div class="pointer"></div>
+  <canvas id="wheel" width="400" height="400"></canvas>
+</div>
 
 <button onclick="spin()">开始抽签</button>
 
@@ -54,53 +77,53 @@ button:hover{opacity:0.9;}
 
 <script>
 const students=[
-{no:1,name:"邱穆芸",id:"242154",job:"副文书"},
-{no:2,name:"陈妍希",id:"242159",job:"副美术"},
-{no:3,name:"张芷欣",id:"242156",job:"副国文"},
-{no:4,name:"杨时瑜",id:"242149",job:"正图书"},
-{no:5,name:"颜姿彤",id:"242163",job:"正科学"},
-{no:6,name:"许亦萱",id:"242153",job:"副科学"},
-{no:7,name:"陈嘉恩",id:"242168",job:"副辅导"},
-{no:8,name:"陈钏宁",id:"242155",job:"正壁报"},
-{no:9,name:"李静恩",id:"242158",job:"正数学"},
-{no:10,name:"李开心",id:"240009",job:""},
-{no:11,name:"刘瑞恩",id:"242160",job:"副壁报"},
-{no:12,name:"黄禹嫣",id:"242164",job:"副财政"},
-{no:13,name:"妮娅",id:"242166",job:"正财政"},
-{no:14,name:"陈姿卉",id:"242162",job:"正辅导"},
-{no:15,name:"何汶宣",id:"242165",job:"副地理"},
-{no:16,name:"王歆茹",id:"242151",job:""},
-{no:17,name:"潘姿颖",id:"242147",job:"正美术"},
-{no:18,name:"施凯馨",id:"242150",job:"正地理"},
-{no:19,name:"陈渝恩",id:"242148",job:"副班长"},
-{no:20,name:"戴湘霖",id:"242157",job:"正文书"},
-{no:21,name:"王婧涵",id:"242152",job:"正国文"},
-{no:22,name:"许悦影",id:"242167",job:""},
-{no:23,name:"朱俊绅",id:"242189",job:"副数学"},
-{no:24,name:"陈毅祥",id:"242177",job:"正卫生"},
-{no:25,name:"谢承邑",id:"242190",job:"正电脑"},
-{no:26,name:"张智勇",id:"242176",job:"正历史"},
-{no:27,name:"何凯旭",id:"242173",job:"副体育"},
-{no:28,name:"赖家禾",id:"242194",job:"副媒体"},
-{no:29,name:"江致承",id:"242171",job:""},
-{no:30,name:"刘俊祥",id:"242186",job:"副服务"},
-{no:31,name:"卢隽益",id:"242187",job:"正班长"},
-{no:32,name:"刘宽辅",id:"242170",job:"副华文"},
-{no:33,name:"卢裕城",id:"242188",job:"副风纪"},
-{no:34,name:"黄康桀",id:"242191",job:"正服务"},
-{no:35,name:"伍思源",id:"242180",job:"正华文"},
-{no:36,name:"彭宇乐",id:"242181",job:"副历史"},
-{no:37,name:"潘家扬",id:"242169",job:"副英文"},
-{no:38,name:"陈晋佑",id:"242178",job:"副电脑"},
-{no:39,name:"陈有权",id:"242182",job:"副卫生"},
-{no:40,name:"余根权",id:"242175",job:"正体育"},
-{no:41,name:"黄凯杰",id:"242192",job:"正英文"},
-{no:42,name:"黄恩杰",id:"242183",job:"副图书"},
-{no:43,name:"黄俊熹",id:"242193",job:"正环保"},
-{no:44,name:"黄明杰",id:"242185",job:"正风纪"},
-{no:45,name:"叶峻睿",id:"242174",job:"副环保"},
-{no:46,name:"叶礼诚",id:"242172",job:"正媒体"},
-{no:47,name:"杨仁喆",id:"242184",job:""}
+{no:1,name:"邱穆芸",id:"242154"},
+{no:2,name:"陈妍希",id:"242159"},
+{no:3,name:"张芷欣",id:"242156"},
+{no:4,name:"杨时瑜",id:"242149"},
+{no:5,name:"颜姿彤",id:"242163"},
+{no:6,name:"许亦萱",id:"242153"},
+{no:7,name:"陈嘉恩",id:"242168"},
+{no:8,name:"陈钏宁",id:"242155"},
+{no:9,name:"李静恩",id:"242158"},
+{no:10,name:"李开心",id:"240009"},
+{no:11,name:"刘瑞恩",id:"242160"},
+{no:12,name:"黄禹嫣",id:"242164"},
+{no:13,name:"妮娅",id:"242166"},
+{no:14,name:"陈姿卉",id:"242162"},
+{no:15,name:"何汶宣",id:"242165"},
+{no:16,name:"王歆茹",id:"242151"},
+{no:17,name:"潘姿颖",id:"242147"},
+{no:18,name:"施凯馨",id:"242150"},
+{no:19,name:"陈渝恩",id:"242148"},
+{no:20,name:"戴湘霖",id:"242157"},
+{no:21,name:"王婧涵",id:"242152"},
+{no:22,name:"许悦影",id:"242167"},
+{no:23,name:"朱俊绅",id:"242189"},
+{no:24,name:"陈毅祥",id:"242177"},
+{no:25,name:"谢承邑",id:"242190"},
+{no:26,name:"张智勇",id:"242176"},
+{no:27,name:"何凯旭",id:"242173"},
+{no:28,name:"赖家禾",id:"242194"},
+{no:29,name:"江致承",id:"242171"},
+{no:30,name:"刘俊祥",id:"242186"},
+{no:31,name:"卢隽益",id:"242187"},
+{no:32,name:"刘宽辅",id:"242170"},
+{no:33,name:"卢裕城",id:"242188"},
+{no:34,name:"黄康桀",id:"242191"},
+{no:35,name:"伍思源",id:"242180"},
+{no:36,name:"彭宇乐",id:"242181"},
+{no:37,name:"潘家扬",id:"242169"},
+{no:38,name:"陈晋佑",id:"242178"},
+{no:39,name:"陈有权",id:"242182"},
+{no:40,name:"余根权",id:"242175"},
+{no:41,name:"黄凯杰",id:"242192"},
+{no:42,name:"黄恩杰",id:"242183"},
+{no:43,name:"黄俊熹",id:"242193"},
+{no:44,name:"黄明杰",id:"242185"},
+{no:45,name:"叶峻睿",id:"242174"},
+{no:46,name:"叶礼诚",id:"242172"},
+{no:47,name:"杨仁喆",id:"242184"}
 ];
 
 const canvas=document.getElementById("wheel");
@@ -110,47 +133,49 @@ const angle=2*Math.PI/size;
 let rotation=0;
 
 function draw(){
-ctx.clearRect(0,0,400,400);
-students.forEach((s,i)=>{
-ctx.beginPath();
-ctx.moveTo(200,200);
-ctx.fillStyle=`hsl(${i*360/size},80%,70%)`;
-ctx.arc(200,200,200,i*angle+rotation,(i+1)*angle+rotation);
-ctx.fill();
+  ctx.clearRect(0,0,400,400);
+  students.forEach((s,i)=>{
+    ctx.beginPath();
+    ctx.moveTo(200,200);
+    ctx.fillStyle=`hsl(${i*360/size},80%,70%)`;
+    ctx.arc(200,200,200,i*angle+rotation,(i+1)*angle+rotation);
+    ctx.fill();
 
-ctx.save();
-ctx.translate(200,200);
-ctx.rotate(i*angle+angle/2+rotation);
-ctx.textAlign="right";
-ctx.fillStyle="#000";
-ctx.font="14px Microsoft YaHei";
-ctx.fillText(s.name,180,5);
-ctx.restore();
-});
+    ctx.save();
+    ctx.translate(200,200);
+    ctx.rotate(i*angle+angle/2+rotation);
+    ctx.textAlign="right";
+    ctx.fillStyle="#000";
+    ctx.font="14px Microsoft YaHei";
+    ctx.fillText(`${s.no} ${s.name}`,180,5);
+    ctx.restore();
+  });
 }
 
 draw();
 
 function spin(){
-let speed=0.3+Math.random()*0.3;
-let timer=setInterval(()=>{
-rotation+=speed;
-speed*=0.98;
+  let speed=0.3+Math.random()*0.3;
+  let timer=setInterval(()=>{
+    rotation+=speed;
+    speed*=0.98;
 
-draw();
+    draw();
 
-if(speed<0.002){
-clearInterval(timer);
+    if(speed<0.002){
+      clearInterval(timer);
 
-let index=Math.floor(
-((2*Math.PI-rotation%(2*Math.PI))/angle)%size
-);
+      // calculate slice under pointer (top of wheel)
+      let index=Math.floor(
+        ((1.5*Math.PI-rotation)%(2*Math.PI))/angle
+      );
+      if(index<0) index+=size;
 
-let s=students[index];
-document.getElementById("result").innerHTML=
-`🎉 抽中：${s.name}（${s.id}）<br>职务：${s.job||"无"}`;
-}
-},20);
+      let s=students[index];
+      document.getElementById("result").innerHTML=
+        `🎉 抽中：${s.no} ${s.name}（${s.id}）`;
+    }
+  },20);
 }
 </script>
 
