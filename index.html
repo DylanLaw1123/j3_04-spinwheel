@@ -14,7 +14,7 @@ body{
   overflow:hidden;
 }
 
-/* 左边转盘区 */
+/* 左 */
 .left{
   flex:1;
   display:flex;
@@ -23,7 +23,7 @@ body{
   position:relative;
 }
 
-/* 右边名单 */
+/* 右 */
 .right{
   width:260px;
   background:#111827;
@@ -32,14 +32,15 @@ body{
   overflow:auto;
 }
 
-.right h3{
-  text-align:center;
-}
-
 .entry{
   padding:6px;
   border-bottom:1px solid #333;
-  font-size:14px;
+}
+
+.active{
+  background:gold;
+  color:black;
+  font-weight:bold;
 }
 
 /* 转盘 */
@@ -47,10 +48,9 @@ body{
   width:500px;
   height:500px;
   border-radius:50%;
-  transition:transform 4s cubic-bezier(0.2,0.8,0.2,1);
 }
 
-/* 中间按钮 */
+/* 按钮 */
 #spinBtn{
   position:absolute;
   width:90px;
@@ -58,20 +58,19 @@ body{
   border-radius:50%;
   background:white;
   border:none;
-  font-weight:bold;
   cursor:pointer;
+  font-weight:bold;
 }
 
-/* ✅ 指针（已贴近转盘右边） */
+/* 指针 */
 .pointer{
   position:absolute;
-  right: calc(50% - 250px); /* 关键：贴到轮盘右边缘 */
-  width:0;
-  height:0;
+  left: calc(50% + 250px - 5px);
+  top:50%;
+  transform:translateY(-50%);
   border-top:18px solid transparent;
   border-bottom:18px solid transparent;
-  border-right:30px solid gold;
-  z-index:10;
+  border-left:30px solid gold;
 }
 
 /* 结果 */
@@ -79,7 +78,48 @@ body{
   position:absolute;
   bottom:20px;
   color:white;
-  font-size:20px;
+}
+
+/* ⭐ 弹窗 */
+#popup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+}
+
+.card{
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  animation:pop 0.4s ease;
+}
+
+.card p{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.card button{
+  margin-top:10px;
+  padding:8px 20px;
+  border:none;
+  background:#4CAF50;
+  color:white;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+@keyframes pop{
+  from{transform:scale(0.5);opacity:0;}
+  to{transform:scale(1);opacity:1;}
 }
 </style>
 </head>
@@ -88,11 +128,8 @@ body{
 
 <div class="left">
   <div class="pointer"></div>
-
   <canvas id="wheel" width="500" height="500"></canvas>
-
   <button id="spinBtn" onclick="spin()">SPIN</button>
-
   <div id="result"></div>
 </div>
 
@@ -101,105 +138,73 @@ body{
   <div id="list"></div>
 </div>
 
+<!-- 弹窗 -->
+<div id="popup">
+  <div class="card">
+    <h2>🎉 抽到的是</h2>
+    <p id="winner"></p>
+    <button onclick="closePopup()">确定</button>
+  </div>
+</div>
+
 <script>
 const students = [
-{no:1,name:"邱穆芸"},
-{no:2,name:"陈妍希"},
-{no:3,name:"张芷欣"},
-{no:4,name:"杨时瑜"},
-{no:5,name:"颜姿彤"},
-{no:6,name:"许亦萱"},
-{no:7,name:"陈嘉恩"},
-{no:8,name:"陈钏宁"},
-{no:9,name:"李静恩"},
-{no:10,name:"李开心"},
-{no:11,name:"刘瑞恩"},
-{no:12,name:"黄禹嫣"},
-{no:13,name:"妮娅"},
-{no:14,name:"陈姿卉"},
-{no:15,name:"何汶宣"},
-{no:16,name:"王歆茹"},
-{no:17,name:"潘姿颖"},
-{no:18,name:"施凯馨"},
-{no:19,name:"陈渝恩"},
-{no:20,name:"戴湘霖"},
-{no:21,name:"王婧涵"},
-{no:22,name:"许悦影"},
-{no:23,name:"朱俊绅"},
-{no:24,name:"陈毅祥"},
-{no:25,name:"谢承邑"},
-{no:26,name:"张智勇"},
-{no:27,name:"何凯旭"},
-{no:28,name:"赖家禾"},
-{no:29,name:"江致承"},
-{no:30,name:"刘俊祥"},
-{no:31,name:"卢隽益"},
-{no:32,name:"刘宽辅"},
-{no:33,name:"卢裕城"},
-{no:34,name:"黄康桀"},
-{no:35,name:"伍思源"},
-{no:36,name:"彭宇乐"},
-{no:37,name:"潘家扬"},
-{no:38,name:"陈晋佑"},
-{no:39,name:"陈有权"},
-{no:40,name:"余根权"},
-{no:41,name:"黄凯杰"},
-{no:42,name:"黄恩杰"},
-{no:43,name:"黄俊熹"},
-{no:44,name:"黄明杰"},
-{no:45,name:"叶峻睿"},
-{no:46,name:"叶礼诚"},
-{no:47,name:"杨仁喆"}
+{no:1,name:"邱穆芸"},{no:2,name:"陈妍希"},{no:3,name:"张芷欣"},
+{no:4,name:"杨时瑜"},{no:5,name:"颜姿彤"},{no:6,name:"许亦萱"},
+{no:7,name:"陈嘉恩"},{no:8,name:"陈钏宁"},{no:9,name:"李静恩"},
+{no:10,name:"李开心"},{no:11,name:"刘瑞恩"},{no:12,name:"黄禹嫣"},
+{no:13,name:"妮娅"},{no:14,name:"陈姿卉"},{no:15,name:"何汶宣"},
+{no:16,name:"王歆茹"},{no:17,name:"潘姿颖"},{no:18,name:"施凯馨"},
+{no:19,name:"陈渝恩"},{no:20,name:"戴湘霖"},{no:21,name:"王婧涵"},
+{no:22,name:"许悦影"},{no:23,name:"朱俊绅"},{no:24,name:"陈毅祥"},
+{no:25,name:"谢承邑"},{no:26,name:"张智勇"},{no:27,name:"何凯旭"},
+{no:28,name:"赖家禾"},{no:29,name:"江致承"},{no:30,name:"刘俊祥"},
+{no:31,name:"卢隽益"},{no:32,name:"刘宽辅"},{no:33,name:"卢裕城"},
+{no:34,name:"黄康桀"},{no:35,name:"伍思源"},{no:36,name:"彭宇乐"},
+{no:37,name:"潘家扬"},{no:38,name:"陈晋佑"},{no:39,name:"陈有权"},
+{no:40,name:"余根权"},{no:41,name:"黄凯杰"},{no:42,name:"黄恩杰"},
+{no:43,name:"黄俊熹"},{no:44,name:"黄明杰"},{no:45,name:"叶峻睿"},
+{no:46,name:"叶礼诚"},{no:47,name:"杨仁喆"}
 ];
 
-/* 右侧名单 */
 const list=document.getElementById("list");
-students.forEach(s=>{
-  list.innerHTML+=`<div class="entry">${s.no} ${s.name}</div>`;
+students.forEach((s,i)=>{
+  list.innerHTML+=`<div class="entry" id="s${i}">${s.no} ${s.name}</div>`;
 });
 
 const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
 
-let angle = 2*Math.PI/students.length;
-let rotation = 0;
+let angle=2*Math.PI/students.length;
+let rotation=0;
 
-/* 画转盘 */
 function draw(){
-  const size=students.length;
-
-  for(let i=0;i<size;i++){
+  ctx.clearRect(0,0,500,500);
+  for(let i=0;i<students.length;i++){
     ctx.beginPath();
     ctx.moveTo(250,250);
-
-    ctx.fillStyle=`hsl(${i*360/size},80%,60%)`;
-
-    ctx.arc(250,250,250,
-      i*angle+rotation,
-      (i+1)*angle+rotation
-    );
-
+    ctx.fillStyle=`hsl(${i*360/students.length},80%,60%)`;
+    ctx.arc(250,250,250,i*angle+rotation,(i+1)*angle+rotation);
     ctx.fill();
 
     ctx.save();
     ctx.translate(250,250);
     ctx.rotate(i*angle+angle/2+rotation);
     ctx.fillStyle="#000";
-    ctx.font="14px Arial";
     ctx.textAlign="right";
     ctx.fillText(`${students[i].no} ${students[i].name}`,230,5);
     ctx.restore();
   }
 }
-
 draw();
 
-/* 抽奖 */
 let spinning=false;
 
 function spin(){
 if(spinning) return;
 spinning=true;
+
+document.querySelectorAll(".entry").forEach(e=>e.classList.remove("active"));
 
 let speed=0.35+Math.random()*0.2;
 
@@ -215,12 +220,24 @@ let index=Math.floor(
 ((2*Math.PI-rotation%(2*Math.PI))/angle)%students.length
 );
 
-document.getElementById("result").innerHTML=
-`🎉 ${students[index].no} ${students[index].name}`;
+let winner=`${students[index].no} ${students[index].name}`;
+
+document.getElementById("result").innerHTML="🎉 "+winner;
+
+/* 高亮 */
+document.getElementById("s"+index).classList.add("active");
+
+/* 弹窗 */
+document.getElementById("winner").innerText=winner;
+document.getElementById("popup").style.display="flex";
 
 spinning=false;
 }
 },16);
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display="none";
 }
 </script>
 
