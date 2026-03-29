@@ -10,7 +10,14 @@ body{
   font-family: Arial, sans-serif;
   background:#0f172a;
   display:flex;
-  height:100vh;
+  flex-direction:column;   /* ⭐ 关键：改成上下结构 */
+  min-height:100vh;
+}
+
+/* 主内容区域 */
+.main{
+  flex:1;
+  display:flex;
   overflow:hidden;
 }
 
@@ -47,7 +54,6 @@ body{
 #wheel{
   width:500px;
   height:500px;
-  border-radius:50%;
 }
 
 /* 按钮 */
@@ -62,7 +68,7 @@ body{
   font-weight:bold;
 }
 
-/* ⭐ 指针（已180°指向转盘） */
+/* 指针 */
 .pointer{
   position:absolute;
   left: calc(50% + 250px - 5px);
@@ -121,22 +127,50 @@ body{
   from{transform:scale(0.5);opacity:0;}
   to{transform:scale(1);opacity:1;}
 }
+
+/* ⭐ footer */
+footer{
+  background:#111827;
+  color:white;
+  text-align:center;
+  padding:10px;
+}
+
+a{
+  color:#60a5fa;
+}
 </style>
 </head>
 
 <body>
 
-<div class="left">
-  <div class="pointer"></div>
-  <canvas id="wheel" width="500" height="500"></canvas>
-  <button id="spinBtn" onclick="spin()">SPIN</button>
-  <div id="result"></div>
+<div class="main">
+
+  <div class="left">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="500" height="500"></canvas>
+    <button id="spinBtn" onclick="spin()">SPIN</button>
+    <div id="result"></div>
+  </div>
+
+  <div class="right">
+    <h3>名单</h3>
+    <div id="list"></div>
+  </div>
+
 </div>
 
-<div class="right">
-  <h3>名单</h3>
-  <div id="list"></div>
-</div>
+<!-- footer ⭐ 已修好 -->
+<footer>
+  <p>
+    名单:
+    <a href="https://dylanlaw1123.github.io/j3_04/" target="_blank">
+      click here
+    </a>
+  </p>
+
+  <p>2026 初三4班 | Made DylanLaw and ChatGPT.</p>
+</footer>
 
 <!-- 弹窗 -->
 <div id="popup">
@@ -147,7 +181,6 @@ body{
   </div>
 </div>
 
-<!-- 🎊 彩带库 -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
@@ -226,15 +259,11 @@ let index=Math.floor(
 let winner=`${students[index].no} ${students[index].name}`;
 
 document.getElementById("result").innerHTML="🎉 "+winner;
-
-/* 高亮 */
 document.getElementById("s"+index).classList.add("active");
 
-/* 弹窗 */
 document.getElementById("winner").innerText=winner;
 document.getElementById("popup").style.display="flex";
 
-/* 🎊 彩带爆炸（左右+中间三连） */
 confetti({particleCount:80, angle:60, spread:60, origin:{x:0}});
 confetti({particleCount:80, angle:120, spread:60, origin:{x:1}});
 setTimeout(()=>confetti({particleCount:120, spread:80, origin:{y:0.6}}),200);
@@ -249,17 +278,6 @@ function closePopup(){
   document.getElementById("popup").style.display="none";
 }
 </script>
-
-<footer>
-  <p>
-    名单:
-    <a href="https://dylanlaw1123.github.io/j3_04/" target="_blank">
-      click here
-    </a>
-  </p>
-
-  <p>2026 初三4班 | Made DylanLaw and ChatGPT.</p>
-</footer>
 
 </body>
 </html>
