@@ -62,7 +62,7 @@ body{
   font-weight:bold;
 }
 
-/* 指针 */
+/* ⭐ 指针（已180°指向转盘） */
 .pointer{
   position:absolute;
   left: calc(50% + 250px - 5px);
@@ -80,7 +80,7 @@ body{
   color:white;
 }
 
-/* ⭐ 弹窗 */
+/* 弹窗 */
 #popup{
   position:fixed;
   top:0;
@@ -146,6 +146,9 @@ body{
     <button onclick="closePopup()">确定</button>
   </div>
 </div>
+
+<!-- 🎊 彩带库 -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
 const students = [
@@ -230,6 +233,12 @@ document.getElementById("s"+index).classList.add("active");
 /* 弹窗 */
 document.getElementById("winner").innerText=winner;
 document.getElementById("popup").style.display="flex";
+
+/* 🎊 彩带爆炸（左右+中间三连） */
+confetti({particleCount:80, angle:60, spread:60, origin:{x:0}});
+confetti({particleCount:80, angle:120, spread:60, origin:{x:1}});
+setTimeout(()=>confetti({particleCount:120, spread:80, origin:{y:0.6}}),200);
+setTimeout(()=>confetti({particleCount:120, spread:80, origin:{y:0.6}}),400);
 
 spinning=false;
 }
